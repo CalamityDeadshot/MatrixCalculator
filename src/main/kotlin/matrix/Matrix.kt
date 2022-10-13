@@ -185,7 +185,6 @@ class Matrix {
     }
 }
 
-fun emptyMatrix() = Matrix()
 fun ensureSameDimensions(m1: Matrix, m2: Matrix) {
     if (m1.rowsCount != m2.rowsCount || m1.columnsCount != m2.columnsCount)
         throw IllegalArgumentException("Matrices are of different size")

@@ -1,6 +1,7 @@
 package matrix
 
 import com.google.common.truth.Truth.assertThat
+import ext.identityMatrixOfSize
 import org.junit.jupiter.api.Test
 
 internal class MatrixTest {
@@ -63,6 +64,24 @@ internal class MatrixTest {
         listOf(-1, 5, 2),
     )
 
+    private val matrix8Inv = Matrix(
+        listOf(3 / 4.0, -31 / 20.0, 9 / 20.0),
+        listOf(1 / 4.0, -13 / 20.0, 7 / 20.0),
+        listOf(-1 / 4.0, 17 / 20.0, -3 / 20.0),
+    )
+
+    private val matrix8tr = Matrix(
+        listOf(4, 1, -1),
+        listOf(-3, 0, 5),
+        listOf(5, 3, 2),
+    )
+
+    private val matrix8adj = Matrix(
+        listOf(-15.0, 31.0, -9.0),
+        listOf(-5.0, 13.0, -7.0),
+        listOf(5.0, -17.0, 3.0),
+    )
+
     private val matrix9 = Matrix(
         listOf(4, -3, 5),
         listOf(-1, 5, 2),
@@ -72,6 +91,22 @@ internal class MatrixTest {
     private val matrix10 = Matrix(
         listOf(0, 3),
         listOf(5, 2)
+    )
+
+    private val matrix10tr = Matrix(
+        listOf(0, 5),
+        listOf(3, 2)
+    )
+
+    private val matrix10adj = Matrix(
+        listOf(2.0, -3.0),
+        listOf(-5.0, 0.0)
+    )
+
+    private val matrix11 = Matrix(
+        listOf(-6, 3, 2),
+        listOf(-1, 0, -12),
+        listOf(3, 2, 1)
     )
 
     @Test
@@ -118,6 +153,11 @@ internal class MatrixTest {
     }
 
     @Test
+    fun `determinant of matrix11 is -253 `() {
+        assertThat(matrix11.determinant()).isEqualTo(-253)
+    }
+
+    @Test
     fun `switching row 1 and 2 of matrix8 produces matrix9`() {
         assertThat(matrix8.switchRow(1, 2)).isEqualTo(matrix9)
     }
@@ -129,10 +169,39 @@ internal class MatrixTest {
     }
 
     @Test
-    fun div() {
-        assert(false)
+    fun `matrix8 inverted is matrix8Inv`() {
+        assertThat(matrix8.inverted()).isEqualTo(matrix8Inv)
     }
 
+    @Test
+    fun `matrix8 transposed is matrix8tr`() {
+        assertThat(matrix8.transposed()).isEqualTo(matrix8tr)
+    }
+
+    @Test
+    fun `matrix10 transposed is matrix10tr`() {
+        assertThat(matrix10.transposed()).isEqualTo(matrix10tr)
+    }
+
+    @Test
+    fun `matrix10 det is -15`() {
+        assertThat(matrix10.determinant()).isEqualTo(-15)
+    }
+
+    @Test
+    fun `matrix8 adjugate is matrix8adj`() {
+        assertThat(matrix8.adjugate()).isEqualTo(matrix8adj)
+    }
+
+    @Test
+    fun `matrix10 adjugate is matrix10adj`() {
+        assertThat(matrix10.adjugate()).isEqualTo(matrix10adj)
+    }
+
+    @Test
+    fun `matrix8 divided by matrix8inv is E`() {
+        assertThat(matrix8 / matrix8Inv).isEqualTo(identityMatrixOfSize(matrix8.columnsCount))
+    }
     @Test
     fun `matrix3 * matrix4 returns matrix5`() {
         assertThat(matrix3 * matrix4).isEqualTo(matrix5)
