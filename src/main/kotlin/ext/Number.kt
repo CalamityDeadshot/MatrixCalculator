@@ -1,5 +1,7 @@
 package ext
 
+import kotlin.math.absoluteValue
+
 operator fun Number.minus(other: Number): Number {
     return when (this) {
         is Long   -> this.toLong() - other.toLong()
@@ -46,4 +48,8 @@ operator fun Number.div(other: Number): Number {
         is Float  -> this.toFloat() / other.toFloat()
         else      -> throw RuntimeException("Unknown numeric type")
     }
+}
+
+fun Double.impreciselyEquals(other: Double, precision: Double = 0.00000000000001) {
+    (this - other).absoluteValue < precision
 }

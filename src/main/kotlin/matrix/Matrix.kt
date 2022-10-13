@@ -57,7 +57,7 @@ class Matrix {
         )
     }
 
-    operator fun div(other: Matrix) = emptyMatrix()
+    operator fun div(other: Matrix) = this * other.inverted()
 
     operator fun times(other: Matrix): Matrix {
         if (columnsCount != other.rowsCount)
@@ -76,7 +76,7 @@ class Matrix {
 
     operator fun get(rowIndex: Int, colIndex: Int): Number {
         if (rowIndex < 0 || colIndex < 0 || rowIndex >= rowsCount || colIndex >= columnsCount)
-            throw IllegalArgumentException("lib.real.Matrix.get: Index out of bounds")
+            throw IllegalArgumentException("Matrix.get: Index out of bounds")
         return value[rowIndex][colIndex]
     }
 
@@ -95,6 +95,11 @@ class Matrix {
         return slice.toMatrix()
     }
 
+    fun cofactor(row: Int, column: Int): Double {
+        val sign = if ((column + row) % 2 == 0) 1 else -1
+        return minorMatrix(row, column).determinant() * sign
+    }
+
     fun determinant(): Double {
         if (rowsCount != columnsCount) throw IllegalArgumentException("Matrix.determinant: Only available for square matrices")
         return when (rowsCount) {
@@ -104,7 +109,7 @@ class Matrix {
                 var sum = 0.0
                 for (column in value.indices) {
                     val sign = if (column % 2 == 0) 1 else -1
-                    sum += (this[0, column] * minorMatrix(0, column).determinant() * sign).toDouble()
+                    sum += (this[0, column] * cofactor(0, column)).toDouble()
                 }
 
                 sum
@@ -153,16 +158,39 @@ class Matrix {
         }
     }
 
-    fun inversed(): Matrix = emptyMatrix()
+    fun inverted(): Matrix {
+        if (this.determinant() == 0.0) {
+            throw IllegalCallerException("Matrix.inverted: Matrix determinant is zero, so inverted matrix does not exist")
+        }
 
-    fun transposed(): Matrix = emptyMatrix()
+        return adjugate() * (1 / this.determinant())
+    }
+
+    fun transposed() =
+        value.mapIndexed { row, rows ->
+            rows.mapIndexed { column, _ ->
+                value[column][row]
+            }.toTypedArray()
+        }.toMatrix()
+
+    fun adjugate() =
+        value.mapIndexed { column, it ->
+            it.mapIndexed { row, _ ->
+                cofactor(column, row) as Number
+            }.toTypedArray()
+        }.toMatrix().transposed()
 
     override fun equals(other: Any?): Boolean {
         if (other !is Matrix) return false
         if (rowsCount != other.rowsCount) return false
         if (columnsCount != other.columnsCount) return false
-        return !value.mapIndexed { index, numbers ->
-            numbers.contentEquals(other.value[index])
+        return !value.mapIndexed { row, numbers ->
+            if (other.value[row][0] is Double) {
+                return@mapIndexed numbers.mapIndexed { column, number ->
+                    (other.value[row][column].toDouble()).impreciselyEquals(number.toDouble())
+                }
+            }
+            numbers.contentEquals(other.value[row])
         }.contains(false)
     }
 

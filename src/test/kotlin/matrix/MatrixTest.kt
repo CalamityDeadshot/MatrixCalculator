@@ -199,8 +199,8 @@ internal class MatrixTest {
     }
 
     @Test
-    fun `matrix8 divided by matrix8inv is E`() {
-        assertThat(matrix8 / matrix8Inv).isEqualTo(identityMatrixOfSize(matrix8.columnsCount))
+    fun `E divided by matrix8inv is matrix8`() {
+        assertThat(identityMatrixOfSize(matrix8.columnsCount) / matrix8).isEqualTo(matrix8Inv)
     }
     @Test
     fun `matrix3 * matrix4 returns matrix5`() {
